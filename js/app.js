@@ -1,6 +1,8 @@
 ;(function ($, window, document, undefined) {
 	"use strict";
 
+	/************* #1 *************/
+
 	var stage = new Kinetic.Stage({
 		container: 'container',
 		width: $(document).width(),
@@ -12,30 +14,35 @@
 	var minutesLayer = new Kinetic.Layer();
 	var secAndMsecLayer = new Kinetic.Layer();
 
+	/************* #2 *************/
 
 	var setup = {
-		refreshTime: 1,
-		startX: 10,
-		startY: 10,
-		ledWidth: 50,
-		peakThickness: 10,
-		ledX: 30,
-		ledY: 30,
-		digitSpace: 15,
-		secondsSpace: 60,
-		ledSecRadius: 10,
-		ledDisabled: '#262626',
-		ledEndabled: '#D30000',
-		clock: '#000000'
+		refreshTime: 	0, //not more than max 1000, if 0 then use 
+		startX: 		10,
+		startY: 		10,
+		ledWidth: 		50,
+		ledThickness: 	10,
+		ledX: 			30,
+		ledY: 			30,
+		digitSpace: 	15,
+		secondsSpace: 	60,
+		ledSecRadius: 	10,
+		ledDisabled: 	'#262626',
+		ledEndabled: 	'#D30000',
+		clock: 			'#000000'
 	}
+
+	/************* #3 *************/
 
 	var clock_bg = new Kinetic.Rect({
 		x: setup.startX,
 		y: setup.startY,
-		width: setup.ledX*2+setup.ledWidth*9+setup.peakThickness*17+setup.digitSpace*5+setup.secondsSpace*3,
-		height: setup.ledY*2+setup.ledWidth*2+setup.peakThickness*2,
+		width: setup.ledX*2+setup.ledWidth*9+setup.ledThickness*17+setup.digitSpace*5+setup.secondsSpace*3,
+		height: setup.ledY*2+setup.ledWidth*2+setup.ledThickness*2,
 		fill: setup.clock
-	});	
+	});
+
+	/************* #4 *************/
 
 	function drawLed(peakX, peakY, rotDeg){
 		if ( rotDeg == undefined ) rotDeg = 0;
@@ -46,11 +53,11 @@
 			y: peakYabsolute,
 			points : [
 				0,										0,
-				setup.peakThickness/2, 					-setup.peakThickness/2,
-				setup.ledWidth+setup.peakThickness/2, 	-setup.peakThickness/2,
-				setup.ledWidth+setup.peakThickness, 	0,
-				setup.ledWidth+setup.peakThickness/2, 	+setup.peakThickness/2,
-				setup.peakThickness/2,					+setup.peakThickness/2
+				setup.ledThickness/2, 					-setup.ledThickness/2,
+				setup.ledWidth+setup.ledThickness/2, 	-setup.ledThickness/2,
+				setup.ledWidth+setup.ledThickness, 		0,
+				setup.ledWidth+setup.ledThickness/2, 	+setup.ledThickness/2,
+				setup.ledThickness/2,					+setup.ledThickness/2
 			],
 			fill: setup.ledDisabled,
 			rotationDeg: rotDeg,
@@ -58,73 +65,79 @@
 		});
 	}
 
+	/************* #5 *************/
+
 	function drawDigit(startX, startY){
 
 		return {
 			top : drawLed(startX, startY),
-			middle : drawLed(startX, startY+setup.ledWidth+setup.peakThickness),
-			bottom : drawLed(startX, startY+(setup.ledWidth+setup.peakThickness)*2),
+			middle : drawLed(startX, startY+setup.ledWidth+setup.ledThickness),
+			bottom : drawLed(startX, startY+(setup.ledWidth+setup.ledThickness)*2),
 			top_left : drawLed(startX, startY, 90),
-			bottom_left : drawLed(startX, startY+setup.ledWidth+setup.peakThickness, 90),
-			top_right : drawLed(startX+setup.ledWidth+setup.peakThickness, startY, 90),
-			bottom_right : drawLed(startX+setup.ledWidth+setup.peakThickness, startY+setup.ledWidth+setup.peakThickness, 90)
+			bottom_left : drawLed(startX, startY+setup.ledWidth+setup.ledThickness, 90),
+			top_right : drawLed(startX+setup.ledWidth+setup.ledThickness, startY, 90),
+			bottom_right : drawLed(startX+setup.ledWidth+setup.ledThickness, startY+setup.ledWidth+setup.ledThickness, 90)
 		}
 	}
 
+	/************* #6 *************/
+
 	var led_h1 = drawDigit(setup.ledX,setup.ledY);
-	var led_h2 = drawDigit(setup.ledX+setup.ledWidth+setup.peakThickness*2+setup.digitSpace,setup.ledY);
+	var led_h2 = drawDigit(setup.ledX+setup.ledWidth+setup.ledThickness*2+setup.digitSpace,setup.ledY);
 
 	var led_sd1 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*2+setup.digitSpace+setup.secondsSpace/2+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*2+setup.digitSpace+setup.secondsSpace/2+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
 	var led_sd2 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*2+setup.digitSpace+setup.secondsSpace/2+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*2+setup.digitSpace+setup.secondsSpace/2+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
-	var led_m1 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*2+setup.digitSpace+setup.secondsSpace,setup.ledY);
-	var led_m2 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*3+setup.digitSpace*2+setup.secondsSpace,setup.ledY);
+	var led_m1 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*2+setup.digitSpace+setup.secondsSpace,setup.ledY);
+	var led_m2 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*3+setup.digitSpace*2+setup.secondsSpace,setup.ledY);
 
 	var led_sd3 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*4+setup.digitSpace*4+setup.secondsSpace+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*4+setup.digitSpace*4+setup.secondsSpace+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
 	var led_sd4 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*4+setup.digitSpace*4+setup.secondsSpace+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*4+setup.digitSpace*4+setup.secondsSpace+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
-	var led_s1 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*4+setup.digitSpace*2+setup.secondsSpace*2,setup.ledY);
-	var led_s2  = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*5+setup.digitSpace*3+setup.secondsSpace*2,setup.ledY);
+	var led_s1 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*4+setup.digitSpace*2+setup.secondsSpace*2,setup.ledY);
+	var led_s2  = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*5+setup.digitSpace*3+setup.secondsSpace*2,setup.ledY);
 
 	var led_sd5 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*6+setup.digitSpace*5+setup.secondsSpace*2+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*6+setup.digitSpace*5+setup.secondsSpace*2+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth/2+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
 	var led_sd6 = new Kinetic.Circle({
-		x: setup.startX+(setup.ledWidth+setup.peakThickness*2)*6+setup.digitSpace*5+setup.secondsSpace*2+setup.ledX-setup.peakThickness/2,
-		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.peakThickness,
+		x: setup.startX+(setup.ledWidth+setup.ledThickness*2)*6+setup.digitSpace*5+setup.secondsSpace*2+setup.ledX-setup.ledThickness/2,
+		y: setup.startY+setup.ledY+setup.ledWidth*1.5+setup.ledThickness,
 		fill: setup.ledEndabled,
 		radius: setup.ledSecRadius
 	});
 
-	var led_ms1 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*6+setup.digitSpace*3+setup.secondsSpace*3,setup.ledY);
-	var led_ms2 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*7+setup.digitSpace*4+setup.secondsSpace*3,setup.ledY);
-	var led_ms3 = drawDigit(setup.ledX+(setup.ledWidth+setup.peakThickness*2)*8+setup.digitSpace*5+setup.secondsSpace*3,setup.ledY);
+	var led_ms1 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*6+setup.digitSpace*3+setup.secondsSpace*3,setup.ledY);
+	var led_ms2 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*7+setup.digitSpace*4+setup.secondsSpace*3,setup.ledY);
+	var led_ms3 = drawDigit(setup.ledX+(setup.ledWidth+setup.ledThickness*2)*8+setup.digitSpace*5+setup.secondsSpace*3,setup.ledY);
+
+	/************* #7 *************/
 
 	staticClockLayer
 	.add(clock_bg)
@@ -214,7 +227,9 @@
 	.add(minutesLayer)
 	.add(secAndMsecLayer);
 
-	function setDigit(digit, setting){
+	/************* #8 *************/
+
+	function setDigit(digit, value){
 		var digitSettings = [
 			{'top' : true, 'middle' : false, 'bottom' : true, 'top_right' : true, 'bottom_right' : true, 'bottom_left' : true, 'top_left' : true},			//0
 			{'top' : false, 'middle' : false, 'bottom' : false, 'top_right' : true, 'bottom_right' : true, 'bottom_left' : false, 'top_left' : false},		//1
@@ -228,24 +243,25 @@
 			{'top' : true, 'middle' : true, 'bottom' : true, 'top_right' : true, 'bottom_right' : true, 'bottom_left' : false, 'top_left' : true},			//9
 		]
 
-		if ( digitSettings[setting].top == true ) digit.top.setFill(setup.ledEndabled)
+		if ( digitSettings[value].top == true ) digit.top.setFill(setup.ledEndabled)
 			else digit.top.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].middle == true ) digit.middle.setFill(setup.ledEndabled);
+		if ( digitSettings[value].middle == true ) digit.middle.setFill(setup.ledEndabled);
 			else digit.middle.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].bottom == true ) digit.bottom.setFill(setup.ledEndabled);
+		if ( digitSettings[value].bottom == true ) digit.bottom.setFill(setup.ledEndabled);
 			else digit.bottom.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].top_right == true ) digit.top_right.setFill(setup.ledEndabled);
+		if ( digitSettings[value].top_right == true ) digit.top_right.setFill(setup.ledEndabled);
 			else digit.top_right.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].bottom_right == true ) digit.bottom_right.setFill(setup.ledEndabled);
+		if ( digitSettings[value].bottom_right == true ) digit.bottom_right.setFill(setup.ledEndabled);
 			else digit.bottom_right.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].bottom_left == true ) digit.bottom_left.setFill(setup.ledEndabled);
+		if ( digitSettings[value].bottom_left == true ) digit.bottom_left.setFill(setup.ledEndabled);
 			else digit.bottom_left.setFill(setup.ledDisabled);
-		if ( digitSettings[setting].top_left == true ) digit.top_left.setFill(setup.ledEndabled);
+		if ( digitSettings[value].top_left == true ) digit.top_left.setFill(setup.ledEndabled);
 			else digit.top_left.setFill(setup.ledDisabled);
 	}
 
+	/************* #9 *************/
+
 	function setTime(){
-		
 		var date = new Date();
 		var milliseconds = date.getMilliseconds();
 		var seconds = date.getSeconds();
@@ -271,8 +287,12 @@
 		setDigit(led_ms3,ms3);
 		if(s1+s2 == 0) minutesLayer.draw();
 		if(m1+m2 == 0) hoursLayer.draw();
-		secAndMsecLayer.draw();
+		secAndMsecLayer.batchDraw();
+		if( setup.refreshTime == 0 )
+			requestAnimationFrame(setTime);
 	}
+
+	/************* #10 *************/
 
 	setTime();
 
@@ -280,6 +300,7 @@
 	minutesLayer.draw();
 	hoursLayer.draw();
 
-	setInterval(setTime, setup.refreshTime)
+	if( setup.refreshTime != 0 )
+			setInterval(setTime, setup.refreshTime);	
 
 }(jQuery, this, this.document));
